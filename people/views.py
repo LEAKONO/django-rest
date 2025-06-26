@@ -24,3 +24,25 @@ def create_person(request):
 
 
 
+@api_view(['PUT'])
+def update_person(request, pk):
+    try:
+        person = Person.objects.get(pk=pk)
+    except Person.DoesNotExist:
+        return Response({'error': 'Person not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = PersonSerializer(person, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+def delete_person(request, pk):
+    try:
+        person = Person.objects.get(pk=pk)
+        person.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Person.DoesNotExist:
+        return Response({'error': 'Person not found'}, status=status.HTTP_404_NOT_FOUND)
